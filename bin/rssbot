@@ -10,8 +10,10 @@ from ob import k
 
 def main():
     parse_cli("rssbot", __version__)
-    k.cfg.prompting = True
-    k.cfg.modules += "irc,rss,cmds"
+    if k.cfg.daemon:
+        daemon()
+    k.cfg.prompting = not k.cfg.prompting
+    k.cfg.modules += "irc,rss"
     k.cfg.nousers = True
     try:
         k.init(k.cfg.modules)
