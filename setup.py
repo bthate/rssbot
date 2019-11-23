@@ -22,7 +22,7 @@ setup(
     long_description_content_type="text/markdown",
     license='Public Domain',
     zip_safe=True,
-    install_requires=["obot"],
+    install_requires=["obot", "feedparser"],
     scripts=["bin/rssbot"],
     packages=["rssbot"],
     classifiers=['Development Status :: 3 - Alpha',
