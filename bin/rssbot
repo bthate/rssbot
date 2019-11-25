@@ -1,26 +1,39 @@
 #!/usr/bin/python3 -u
 
+""" IRC bot that displays RSS feeds in channels. """
+
 import os, sys ; sys.path.insert(0, os.getcwd())
 
-from ob.err import EINIT
-from ob.shl import daemon, execute, parse_cli
-from obot import __version__
+import json
+import ob
+import obot
+import os
+import time
+import threading
 
-from ob import k
+from ob import Object, k, __version__
+from ob.dpt import dispatch
+from ob.pst import Persist
+from ob.shl import execute, hd, parse_cli, set_completer
+from ob.tms import elapsed
+from ob.utl import get_name, mods
+
+opts = [
+    ('-d', '', 'string', "", 'workdir', 'set working directory.'),
+    ('-l', '', 'string', '', 'level', 'loglevel.'),
+    ('-m', '', 'string', '', 'modules', 'modules to load.'),
+    ('-o', '', "string", "", 'options', "options to use."),
+    ('-p', '', "store_false", True, "prompting", "prompt for initial values."),
+    ('-s', '', 'store_true', False, 'dosave', 'save configuration files.'),
+    ('-u', '', 'store_true', False,'users', 'enable users.'),
+    ('-v', '', 'store_true', False, 'verbose', 'enable verbose mode.'),
+    ('-x', '', 'string', '', 'exclude', 'skip modules'),
+]
 
 def main():
-    parse_cli("rssbot", __version__)
-    if k.cfg.daemon:
-        daemon()
-    k.walk("obot.rss")
-    k.cfg.prompting = not k.cfg.prompting
-    k.cfg.modules += "irc,rss"
-    k.cfg.nousers = True
-    try:
-        k.init(k.cfg.modules)
-    except EINIT:
-        print("rssbot <localhost> <channel> <nick>")
-        return
+    parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
+    k.init("obot.irc")
+    k.walk("rssbot")
     k.start()
     k.wait()
 
