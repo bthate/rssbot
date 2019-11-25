@@ -1,0 +1,5 @@
+cp init.d/rssbot.service /etc/systemd/system
+systemctl enable rssbot
+systemctl daemon-reload
+service rssbot start
+systemctl status rssbot
