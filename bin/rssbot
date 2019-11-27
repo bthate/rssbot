@@ -12,7 +12,7 @@ from ob.dpt import dispatch
 from ob.pst import Persist
 from ob.shl import execute, hd, parse_cli, set_completer
 from ob.tms import elapsed
-from ob.utl import get_name, mods
+from ob.utl import get_name
 
 from rssbot import __version__
 
@@ -33,6 +33,7 @@ def main():
     parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
     k.cmds.register("cmds", cmds)
     k.init("rssbot")
+    k.init("obot.irc")
     k.load_mod("rssbot.cmds")
     k.start()
     k.wait()

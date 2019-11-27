@@ -2,7 +2,7 @@ import time
 
 from ob import k
 
-from rssbot import Rss
+from rssbot import Rss, fetcher
 
 
 def delete(event):
