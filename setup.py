@@ -13,7 +13,7 @@ def readme():
 
 setup(
     name='rssbot',
-    version='20',
+    version='21',
     url='https://github.com/bthate/rssbot',
     author='Bart Thate',
     author_email='bthate@dds.nl',

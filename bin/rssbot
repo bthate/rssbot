@@ -1,9 +1,5 @@
 #!/usr/bin/python3 -u
 
-""" IRC bot that displays RSS feeds in channels. """
-
-import os, sys ; sys.path.insert(0, os.getcwd())
-
 import json
 import ob
 import obot
@@ -11,12 +7,14 @@ import os
 import time
 import threading
 
-from ob import Object, k, __version__
+from ob import Object, k
 from ob.dpt import dispatch
 from ob.pst import Persist
 from ob.shl import execute, hd, parse_cli, set_completer
 from ob.tms import elapsed
 from ob.utl import get_name, mods
+
+from rssbot import __version__
 
 opts = [
     ('-d', '', 'string', "", 'workdir', 'set working directory.'),
@@ -25,15 +23,17 @@ opts = [
     ('-o', '', "string", "", 'options', "options to use."),
     ('-p', '', "store_false", True, "prompting", "prompt for initial values."),
     ('-s', '', 'store_true', False, 'dosave', 'save configuration files.'),
-    ('-u', '', 'store_true', False,'users', 'enable users.'),
     ('-v', '', 'store_true', False, 'verbose', 'enable verbose mode.'),
-    ('-x', '', 'string', '', 'exclude', 'skip modules'),
 ]
+
+def cmds(event):
+    event.reply("|".join(sorted(k.cmds)))
 
 def main():
     parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
-    k.init("obot.irc")
-    k.walk("rssbot")
+    k.cmds.register("cmds", cmds)
+    k.init("rssbot")
+    k.load_mod("rssbot.cmds")
     k.start()
     k.wait()
 
