@@ -1,4 +1,4 @@
-__version__ = 21
+__version__ = 22
 
 import datetime
 import io
