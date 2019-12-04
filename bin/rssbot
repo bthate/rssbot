@@ -5,6 +5,7 @@ import ob
 import ob.evt
 import obot
 import os
+import sys
 import time
 import threading
 
@@ -14,6 +15,7 @@ from ob.err import EINIT
 from ob.pst import Persist
 from ob.shl import execute, hd, parse_cli, set_completer
 from ob.tms import elapsed
+from ob.trm import reset
 from ob.utl import get_name
 
 from rssbot import __version__
@@ -30,6 +32,7 @@ ob.evt.aliases = {
            }
 
 opts = [
+    ('-b', '', 'store_true', False, 'daemon', 'daemon mode.'),
     ('-d', '', 'string', "", 'workdir', 'set working directory.'),
     ('-l', '', 'string', '', 'level', 'loglevel.'),
     ('-m', '', 'string', '', 'modules', 'modules to load.'),
@@ -58,12 +61,13 @@ def cmds(event):
 
 def main():
     parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
-    k.cfg.modules += "obot.irc,obot.show,rssbot.cmds"
+    k.cfg.modules += "rssbot.cmds"
     if k.cfg.daemon:
         k.cfg.prompting = False
         daemon()
+    if not k.init("obot.irc"):
+        return
     k.init(k.cfg.modules)
-    k.cmds.register("cmds", cmds)
     k.start()
     k.wait()
 
