@@ -7,10 +7,6 @@
 
 from setuptools import setup
 
-def readme():
-    with open('README.rst') as file:
-        return file.read()
-
 setup(
     name='rssbot',
     version='22',
@@ -18,7 +14,15 @@ setup(
     author='Bart Thate',
     author_email='bthate@dds.nl',
     description="IRC bot you can use to display RSS feeds.",
-    long_description=readme(),
+    long_description="""RSSBOT is a IRC bot you can use to display RSS feeds.
+RSSBOT is in the Public Domain and contains no copyright or LICENSE.
+
+1) pip3 install rssbot
+2) rssbot <server> <channel> <nick> 
+3) !rss <url>
+4) !fetch
+
+    """,
     long_description_content_type="text/markdown",
     license='Public Domain',
     zip_safe=True,
