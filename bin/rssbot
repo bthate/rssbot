@@ -9,6 +9,7 @@ import threading
 
 from ob import Object, k
 from ob.dpt import dispatch
+from ob.err import EINIT
 from ob.pst import Persist
 from ob.shl import execute, hd, parse_cli, set_completer
 from ob.tms import elapsed
@@ -32,8 +33,8 @@ def cmds(event):
 def main():
     parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
     k.cmds.register("cmds", cmds)
-    k.init("rssbot")
     k.init("obot.irc")
+    k.init("rssbot")
     k.load_mod("rssbot.cmds")
     k.start()
     k.wait()
