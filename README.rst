@@ -1,6 +1,3 @@
-README
-######
-
 RSSBOT is a IRC bot you can use to display RSS feeds.
 RSSBOT is in the Public Domain and contains no copyright or LICENSE.
 
