@@ -2,6 +2,7 @@
 
 import json
 import ob
+import ob.evt
 import obot
 import os
 import time
@@ -17,6 +18,17 @@ from ob.utl import get_name
 
 from rssbot import __version__
 
+ob.evt.aliases = {
+           "c": "cmds",
+           "cfg": "show cfg",
+           "f": "find",
+           "l": "log",
+           "ps": "show tasks",
+           "t": "todo",
+           "u": "show uptime",
+           "v": "show version"
+           }
+
 opts = [
     ('-d', '', 'string', "", 'workdir', 'set working directory.'),
     ('-l', '', 'string', '', 'level', 'loglevel.'),
@@ -27,15 +39,31 @@ opts = [
     ('-v', '', 'store_true', False, 'verbose', 'enable verbose mode.'),
 ]
 
+def daemon():
+    pid = os.fork()
+    if pid != 0:
+        reset()
+        os._exit(0)
+    os.setsid()
+    os.umask(0)
+    si = open("/dev/null", 'r')
+    so = open("/dev/null", 'a+')
+    se = open("/dev/null", 'a+')
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+
 def cmds(event):
     event.reply("|".join(sorted(k.cmds)))
 
 def main():
     parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
+    k.cfg.modules += "obot.irc,obot.show,rssbot.cmds"
+    if k.cfg.daemon:
+        k.cfg.prompting = False
+        daemon()
+    k.init(k.cfg.modules)
     k.cmds.register("cmds", cmds)
-    k.init("obot.irc")
-    k.init("rssbot")
-    k.load_mod("rssbot.cmds")
     k.start()
     k.wait()
 
