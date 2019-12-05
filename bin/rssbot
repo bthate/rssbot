@@ -12,6 +12,7 @@ import threading
 from ob import Object, k
 from ob.dpt import dispatch
 from ob.err import EINIT
+from ob.krn import Console
 from ob.pst import Persist
 from ob.shl import execute, hd, parse_cli, set_completer
 from ob.tms import elapsed
@@ -19,17 +20,6 @@ from ob.trm import reset
 from ob.utl import get_name
 
 from rssbot import __version__
-
-ob.evt.aliases = {
-           "c": "cmds",
-           "cfg": "show cfg",
-           "f": "find",
-           "l": "log",
-           "ps": "show tasks",
-           "t": "todo",
-           "u": "show uptime",
-           "v": "show version"
-           }
 
 opts = [
     ('-b', '', 'store_true', False, 'daemon', 'daemon mode.'),
@@ -56,18 +46,15 @@ def daemon():
     os.dup2(so.fileno(), sys.stdout.fileno())
     os.dup2(se.fileno(), sys.stderr.fileno())
 
-def cmds(event):
-    event.reply("|".join(sorted(k.cmds)))
-
 def main():
     parse_cli("rssbot", __version__, opts, hd(".rssbot"), "rssbot <server> <channel> <nick>")
-    k.cfg.modules += "rssbot.cmds"
     if k.cfg.daemon:
-        k.cfg.prompting = False
         daemon()
     if not k.init("obot.irc"):
         return
-    k.init(k.cfg.modules)
+    k.init("rssbot")
+    console = Console()
+    console.start()
     k.start()
     k.wait()
 
