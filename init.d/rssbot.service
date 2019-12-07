@@ -1,8 +1,8 @@
 [Unit]
-Description=obot
+Description=rssbot
 
 [Service]
-ExecStart=/usr/local/bin/obot -k -d /var/lib/obot --logdir /var/log/obot -z -p
+ExecStart=/usr/local/bin/rssbot -k -d /var/lib/rssbot --logdir /var/log/rssbot -p -l debug
 
 [Install]
 WantedBy=multi-user.target
