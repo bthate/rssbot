@@ -46,6 +46,7 @@ opts = [
 
 def main():
     parse_cli("rssbot", __version__, opts)
+    k.start()
     k.init("rssbot")
     k.init(k.cfg.modules)
     if k.cfg.exec:
@@ -57,8 +58,7 @@ def main():
         c = Console()
         c.start()
         k.add(c)
-    if k.cfg.shell or k.cfg.kernel:
-        k.start()
+    if k.cfg.shell or k.cfg.kernel or k.cfg.prompting:
         k.wait()
  
 execute(main)
