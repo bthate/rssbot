@@ -3,20 +3,16 @@
 import json
 import ob
 import ob.evt
-import obot
 import os
 import time
 import threading
 
-from ob import Object, k
+from ob import k, __version__
 from ob.csl import Console
-from ob.dpt import dispatch
-from ob.pst import Persist
-from ob.shl import execute, hd, parse_cli, set_completer
+from ob.shl import enable_history, execute, hd, parse_cli, set_completer, writepid
 from ob.tms import elapsed
+from ob.trm import reset
 from ob.utl import get_name
-
-from rssbot import __version__
 
 ob.evt.aliases = {
            "c": "cmds",
@@ -27,39 +23,63 @@ ob.evt.aliases = {
            "t": "todo",
            "u": "show uptime",
            "v": "show version"
-}
+           }
 
 opts = [
+    ('-b', '', 'store_true', False, 'daemon', 'background mode.'),
     ('-d', '', 'string', "", 'workdir', 'set working directory.'),
-    ('-k', '', "store_true", False, "kernel", "read from previous kernel config."),
-    ('-l', '', 'string', '', 'level', 'loglevel.'),
     ('-m', '', 'string', '', 'modules', 'modules to load.'),
-    ('-o', '', "string", "", 'options', "options to use."),
-    ('-p', '', "store_false", True, "prompting", "prompt for initial values."),
-    ('-r', '', 'store_true', False, 'resume', 'resume the bot.'),
-    ('-s', '', 'store_true', False, 'dosave', 'save configuration files.'),
-    ('-v', '', 'store_true', False, 'verbose', 'enable verbose mode.'),
     ('-x', '', 'store_true', False, 'exec', 'execute command.'),
+    ('-o', '', "string", "", 'options', "options to use."),
+    ('-k', '', "store_true", False, "kernel", "read from previous kernel config."),
+    ('-p', '', "store_false", True, "prompting", "prompt for initial values."),
+    ('-s', '', 'store_true', False, 'dosave', 'save configuration files.'),
     ('-z', '', 'store_false', True, 'shell', 'disable shell.'),
+    ('-l', '', 'string', '', 'level', 'loglevel.'),
     ('', '--logdir', "string", "", 'logdir', "directory to find the logfiles."),
 ]
 
-def main():
-    parse_cli("rssbot", __version__, opts)
-    k.start()
-    k.init("rssbot")
+def boot():
     k.init(k.cfg.modules)
     if k.cfg.exec:
         k.cmd(k.cfg.txt)
         return
-    if not k.init("obot.irc"):
-        return
-    if k.cfg.shell or k.cfg.prompting:
+    if k.cfg.kernel:
+        p = ob.last(k.cfg)
+    elif k.cfg.dosave:
+        k.cfg.save()
+    set_completer(k.cmds)
+    enable_history()
+    writepid()
+    k.start()
+    if k.cfg.kernel or k.cfg.shell:
         c = Console()
-        c.start()
         k.add(c)
-    if k.cfg.shell or k.cfg.kernel or k.cfg.prompting:
+        c.start()
         k.wait()
- 
+
+def daemon():
+    pid = os.fork()
+    if pid != 0:
+        reset()
+        os._exit(0)
+    os.setsid()
+    os.umask(0)
+    si = open("/dev/null", 'r')
+    so = open("/dev/null", 'a+')
+    se = open("/dev/null", 'a+')
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
+
+def main():
+    parse_cli("rssbot", __version__, opts, hd(".rssbot"), """ rssbot [-b] [-k] [-p] [-z] [-x cmd] [options] <server> <channel> <nick> """)
+    if k.cfg.daemon:
+        daemon()
+    k.walk("rssbot")
+    if not k.cfg.exec and not k.init("obot.irc"):
+        return
+    boot()
+
 execute(main)
 os._exit(0)
