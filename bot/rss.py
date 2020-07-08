@@ -125,10 +125,7 @@ class Fetcher(Object):
 
     def start(self, repeat=True):
         last(Fetcher.cfg)
-        print("yo")
-        print(Fetcher.cfg)
         last(Fetcher.seen)
-        print(Fetcher.seen)
         if repeat:
             repeater = Repeater(300.0, self.run)
             repeater.start()
