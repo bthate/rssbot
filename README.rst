@@ -11,27 +11,13 @@
 
 Welcome to RSSBOT, display rss feeds in your irc channel ! see https://pypi.org/project/botlib/
 
-1) pip3 install rssbot
-2) rssbot cfg server=<server> channel=<channel> nick=<nick>
-3) rssbot rss <url>
-4) rssbot mods=irc,rss,csl
-5) type !fetch in channel
-
-examples:
-
 ::
 
- > rssbot cfg server=irc.freenode.net channel=\#botlib nick=rssbot
- channel=#botlib nick=rssbot port=6667 realname=botlib server=irc.freenode.net username=botlib
-
- > rssbot rss https://news.ycombinator.com/rss
- ok 1
-
- > rssbot rss
- 0 https://news.ycombinator.com/rss
-
- > rssbot fetch
- fetched 0
+ 1) pip3 install rssbot
+ 2) rssbot cfg server=<server> channel=<channel> nick=<nick>
+ 3) rssbot rss <url>
+ 4) rssbot mods=irc,rss,csl
+ 5) type !fetch in channel
 
 if you want to run the bot 24/7 you can install RSSBOT as a service for the systemd daemon. 
 you can do this by copying the following into the /etc/systemd/system/rssbot.service file:
@@ -55,7 +41,7 @@ then add the rssbot service with:
 
  > sudo systemctl enable rssbot
  > sudo systemctl daemon-reload
- > sudo service botd restart
+ > sudo service rssbot restart
 
 if you don't want the bot to startup at boot, remove the service file:
 
@@ -63,9 +49,7 @@ if you don't want the bot to startup at boot, remove the service file:
 
  > sudo rm /etc/systemd/system/rssbot.service
 
-
-C O N T A C T
-=============
+that's all, hope you enjoy your rss feeds dumped into your channel ;]
 
 you can contact me on IRC/freenode/#dunkbots or email me at bthate@dds.nl
 
