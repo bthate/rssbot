@@ -3,10 +3,8 @@
 #
 #
 
-import bot.obj, os
-
 from bot.csl import execute
-from bot.krn import k
+from bot.krn import k, os
 from bot.obj import get, tojson
 from bot.prs import parse_cli
 
