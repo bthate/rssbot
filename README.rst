@@ -1,4 +1,13 @@
-R   S   S   B   O   T  
+.. parsed-literal::
+
+#####      #####      #####     ######     #######    ####### 
+#     #    #     #    #     #    #     #    #     #       #    
+#     #    #          #          #     #    #     #       #    
+######      #####      #####     ######     #     #       #    
+#   #            #          #    #     #    #     #       #    
+#    #     #     #    #     #    #     #    #     #       #    
+#     #     #####      #####     ######     #######       #    
+                                                               
 
 Welcome to RSSBOT, display rss feeds in your irc channel ! see https://pypi.org/project/botlib/
 
