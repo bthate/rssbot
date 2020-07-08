@@ -5,7 +5,7 @@
 from setuptools import setup
 
 def read():
-    return open("README", "r").read()
+    return open("README.rst", "r").read()
 
 setup(
     name='rssbot',

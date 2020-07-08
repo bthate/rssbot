@@ -8,12 +8,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 from urllib.request import Request, urlopen
 
-from bot.clk import Repeater
-from bot.dbs import Db
-from bot.krn import k
-from bot.obj import Cfg, Default, Object, edit, get, last, save, update
-from bot.thr import launch
-from bot.tms import to_time, day
+from .clk import Repeater
+from .dbs import Db
+from .krn import k
+from .obj import Cfg, Object, edit, get, last, save, update
+from .thr import launch
+from .tms import to_time, day
 
 def __dir__():
     return ("Cfg", "Rss", "Fetcher", "cmds", "display", "feed", "fetch", "rm", "rss")
@@ -35,7 +35,7 @@ class Cfg(Cfg):
 
     pass
 
-class Feed(Default):
+class Feed(Object):
 
     pass
 

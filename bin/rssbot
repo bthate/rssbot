@@ -1,23 +1,22 @@
 #!/usr/bin/python3 -u
-# RSSBOT - displays feeds in your IRC channel
+# RSSBOT - display feeds in your IRC channel
 #
 #
 
-import sys, os ; sys.path.insert(0, os.getcwd())
+import bot.obj, os
 
 from bot.csl import execute
 from bot.krn import k
+from bot.obj import get, tojson
 from bot.prs import parse_cli
 
 def main():
     c = parse_cli("rssbot")
-    if c.txt:
-        k.load_mod("bot.rss")
+    if get(c, "txt"):
+        k.walk("bot")
         return k.cmd(c.origtxt)
-    if not c.mods:
-        c.mods = "irc,rss,csl"
     k.start()
-    k.init(c.mods)
+    k.init("irc,rss,csl,cmd,ent,opr")
     k.wait()
 
 execute(main)
