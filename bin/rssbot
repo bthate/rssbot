@@ -10,14 +10,14 @@ from bot.krn import k
 from bot.prs import parse_cli
 
 def main():
-    c = parse_cli()
-    c.wd = c.wd or os.path.expanduser("~/.rssbot")
+    c = parse_cli("rssbot")
     if c.txt:
-        k.walk("bot")
+        k.load_mod("bot.rss")
         return k.cmd(c.origtxt)
-    if c.mods:
-        k.start()
-        k.init(c.mods)
-        k.wait()
+    if not c.mods:
+        c.mods = "irc,rss,csl"
+    k.start()
+    k.init(c.mods)
+    k.wait()
 
 execute(main)
