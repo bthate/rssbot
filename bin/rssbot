@@ -5,12 +5,11 @@
 
 from bot.csl import execute
 from bot.krn import k, os
-from bot.obj import get, tojson
 from bot.prs import parse_cli
 
 def main():
     c = parse_cli("rssbot")
-    if get(c, "txt"):
+    if c.get("txt", None):
         k.walk("bot")
         return k.cmd(c.origtxt)
     k.start()

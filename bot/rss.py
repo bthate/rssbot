@@ -75,7 +75,7 @@ class Fetcher(Object):
         for key in dl:
             if not key:
                 continue
-            data = get(o, key, None)
+            data = o.get(key, None)
             if key == "link" and self.cfg.tinyurl:
                 datatmp = get_tinyurl(data)
                 if datatmp:
@@ -97,8 +97,8 @@ class Fetcher(Object):
             if not o:
                 continue
             f = Feed()
-            update(f, obj)
-            update(f, o)
+            f.update(obj)
+            f.update(o)
             u = urllib.parse.urlparse(f.link)
             if u.path and not u.path == "/":
                 url = "%s://%s/%s" % (u.scheme, u.netloc, u.path)
@@ -110,9 +110,9 @@ class Fetcher(Object):
             counter += 1
             objs.append(f)
             if self.cfg.dosave:
-                save(f)
+                f.save()
         if objs:
-            save(Fetcher.seen)
+            Fetcher.seen.save()
         for o in objs:
             k.fleet.announce(self.display(o))
         return counter
@@ -133,7 +133,7 @@ class Fetcher(Object):
             return repeater
 
     def stop(self):
-        save(Fetcher.seen)
+        Fetcher.seen.save()
 
 def file_time(timestamp):
     return str(datetime.datetime.fromtimestamp(timestamp)).replace(" ", os.sep) + "." + str(random.randint(111111, 999999))
@@ -204,7 +204,7 @@ def rm(event):
         o._deleted = True
         got.append(o)
     for o in got:
-        save(o)
+        o.save()
     event.reply("ok")
 
 def display(event):
@@ -215,7 +215,7 @@ def display(event):
     db = Db()
     for o in db.find("bot.rss.Rss", {"rss": event.args[0]}):
         edit(o, setter)
-        save(o)
+        o.save()
     event.reply("ok")
 
 def feed(event):
@@ -276,5 +276,5 @@ def rss(event):
         return
     o = Rss()
     o.rss = event.args[0]
-    save(o)
+    o.save()
     event.reply("ok")
