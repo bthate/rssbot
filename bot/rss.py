@@ -11,7 +11,8 @@ from urllib.request import Request, urlopen
 from .clk import Repeater
 from .dbs import Db
 from .krn import k
-from .obj import Cfg, Default, Object, edit, get, last, save, update
+from .obj import Cfg, Default, Object
+from .opr import edit
 from .thr import launch
 from .tms import to_time, day
 
@@ -124,8 +125,8 @@ class Fetcher(Object):
         return thrs
 
     def start(self, repeat=True):
-        last(Fetcher.cfg)
-        last(Fetcher.seen)
+        Fetcher.cfg.last()
+        Fetcher.seen.last()
         if repeat:
             repeater = Repeater(300.0, self.run)
             repeater.start()
