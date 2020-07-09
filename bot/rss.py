@@ -185,7 +185,7 @@ def unescape(text):
     return html.parser.HTMLParser().unescape(txt)
 
 def useragent():
-    return 'Mozilla/5.0 (X11; Linux x86_64) RSSBOT +http://git@bitbucket.org/bthate/rssbot)'
+    return 'Mozilla/5.0 (X11; Linux x86_64) RSSBOT +http://bitbucket.org/bthate/rssbot)'
 
 def cmds(event):
     event.reply("|".join(sorted(k.cmds)))
