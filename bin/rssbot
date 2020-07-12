@@ -4,7 +4,7 @@
 #
 
 from bot.csl import execute
-from bot.krn import k, os
+from bot.krn import k
 from bot.prs import parse_cli
 
 def main():
