@@ -1,1 +1,1 @@
-rm -fR rssbot.egg-info build dist MANIFEST bot/*~ bot/__pycache__ bin/*~ *~
+rm -fR dist env html rssbot.egg-info build dist MANIFEST bot/*~ bot/__pycache__ bin/*~ *~
