@@ -2,9 +2,9 @@ Welcome to RSSBOT, display rss feeds in your irc channel ! see https://pypi.org/
 
 ::
 
- > pip3 install rssbot --upgrade --force-reinstall
- > rssbot cfg server=<server> channel=<channel> nick=<nick>
- > rssbot rss <url>
+ > pip3 install rssbot
+ > rssbot cfg server=irc.freenode.net channel=\#dunkbots nick=rssbot
+ > rssbot rss https://pypi.org/rss/project/rssbot/releases.xml 
  > rssbot
 
 if you want to run the bot 24/7 you can install RSSBOT as a service for the systemd daemon. 
