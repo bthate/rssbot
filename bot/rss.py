@@ -8,12 +8,12 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 from urllib.request import Request, urlopen
 
+from .cls import Dict
 from .cfg import Cfg
 from .clk import Repeater
 from .cls import Default
-from .dbs import Db, last
 from .krn import k
-from .obj import Object
+from .obj import Db, Object
 from .opr import edit
 from .thr import launch
 from .tms import to_time, day
@@ -38,17 +38,17 @@ class Cfg(Cfg):
 
     pass
 
-class Feed(Default):
+class Feed(Dict):
 
     pass
 
-class Rss(Object):
+class Rss(Dict):
 
     def __init__(self):
         super().__init__()
         self.rss = ""
 
-class Seen(Object):
+class Seen(Dict):
 
     def __init__(self):
         super().__init__()
@@ -127,8 +127,8 @@ class Fetcher(Object):
         return thrs
 
     def start(self, repeat=True):
-        last(Fetcher.cfg)
-        last(Fetcher.seen)
+        Fetcher.cfg.last()
+        Fetcher.seen.last()
         if repeat:
             repeater = Repeater(300.0, self.run)
             repeater.start()
