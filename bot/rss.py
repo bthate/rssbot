@@ -8,14 +8,14 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 from urllib.request import Request, urlopen
 
-from .cls import Dict
 from .cfg import Cfg
 from .clk import Repeater
-from .cls import Default
+from .dbs import Db, last
+from .dft import Default
 from .krn import k
-from .obj import Db, Object
+from .obj import Object
 from .opr import edit
-from .thr import launch
+from .tsk import launch
 from .tms import to_time, day
 
 def __dir__():
@@ -38,17 +38,17 @@ class Cfg(Cfg):
 
     pass
 
-class Feed(Dict):
+class Feed(Object):
 
     pass
 
-class Rss(Dict):
+class Rss(Object):
 
     def __init__(self):
         super().__init__()
         self.rss = ""
 
-class Seen(Dict):
+class Seen(Object):
 
     def __init__(self):
         super().__init__()
@@ -127,8 +127,8 @@ class Fetcher(Object):
         return thrs
 
     def start(self, repeat=True):
-        Fetcher.cfg.last()
-        Fetcher.seen.last()
+        last(Fetcher.cfg)
+        last(Fetcher.seen)
         if repeat:
             repeater = Repeater(300.0, self.run)
             repeater.start()

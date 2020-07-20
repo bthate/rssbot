@@ -3,17 +3,15 @@
 #
 #
 
-from bot.csl import execute
-from bot.krn import k
-from bot.prs import parse_cli
+from bot.spc import execute, get, k , parse_cli
 
 def main():
     c = parse_cli("rssbot")
-    if c.get("txt", None):
+    if get(c, "txt", None):
         k.walk("bot")
         return k.cmd(c.origtxt)
     k.start()
-    k.init("irc,rss,csl")
+    k.init("irc,bot.rss,csl,shw")
     k.wait()
 
 execute(main)
