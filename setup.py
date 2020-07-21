@@ -9,7 +9,7 @@ def read():
 
 setup(
     name='rssbot',
-    version='28',
+    version='30',
     url='https://bitbucket.org/bthate/rssbot',
     author='Bart Thate',
     author_email='bthate@dds.nl', 
@@ -18,7 +18,7 @@ setup(
     license='Public Domain',
     install_requires=["botlib", "feedparser"],
     zip_safe=False,
-    packages=["bot"],
+    packages=["rssbot"],
     scripts=["bin/rssbot"],
     classifiers=['Development Status :: 4 - Beta',
                  'License :: Public Domain',

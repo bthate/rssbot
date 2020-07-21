@@ -8,15 +8,15 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 from urllib.request import Request, urlopen
 
-from .cfg import Cfg
-from .clk import Repeater
-from .dbs import Db, last
-from .dft import Default
-from .krn import k
-from .obj import Object
-from .opr import edit
-from .tsk import launch
-from .tms import to_time, day
+from bot.cfg import Cfg
+from bot.clk import Repeater
+from bot.dbs import Db, last
+from bot.dft import Default
+from bot.krn import k
+from bot.obj import Object, get, save, update
+from bot.opr import edit
+from bot.tsk import launch
+from bot.tms import to_time, day
 
 def __dir__():
     return ("Cfg", "Rss", "Fetcher", "cmds", "display", "feed", "fetch", "rm", "rss")
@@ -77,7 +77,7 @@ class Fetcher(Object):
         for key in dl:
             if not key:
                 continue
-            data = o.get(key, None)
+            data = get(o, key, None)
             if key == "link" and self.cfg.tinyurl:
                 datatmp = get_tinyurl(data)
                 if datatmp:
@@ -99,8 +99,8 @@ class Fetcher(Object):
             if not o:
                 continue
             f = Feed()
-            f.update(obj)
-            f.update(o)
+            update(f, obj)
+            update(f, o)
             u = urllib.parse.urlparse(f.link)
             if u.path and not u.path == "/":
                 url = "%s://%s/%s" % (u.scheme, u.netloc, u.path)
@@ -112,9 +112,9 @@ class Fetcher(Object):
             counter += 1
             objs.append(f)
             if self.cfg.dosave:
-                f.save()
+                save(f)
         if objs:
-            Fetcher.seen.save()
+            save(Fetcher.seen)
         for o in objs:
             k.fleet.announce(self.display(o))
         return counter
@@ -122,7 +122,7 @@ class Fetcher(Object):
     def run(self):
         thrs = []
         db = Db()
-        for o in db.all("bot.rss.Rss"):
+        for o in db.all("rssbot.Rss"):
             thrs.append(launch(self.fetch, o))
         return thrs
 
@@ -135,7 +135,7 @@ class Fetcher(Object):
             return repeater
 
     def stop(self):
-        Fetcher.seen.save()
+        save(Fetcher.seen)
 
 def file_time(timestamp):
     return str(datetime.datetime.fromtimestamp(timestamp)).replace(" ", os.sep) + "." + str(random.randint(111111, 999999))
@@ -190,7 +190,7 @@ def unescape(text):
 def useragent():
     return 'Mozilla/5.0 (X11; Linux x86_64) RSSBOT +http://bitbucket.org/bthate/rssbot)'
 
-def cmds(event):
+def cmd(event):
     event.reply("|".join(sorted(k.cmds)))
 
 def rm(event):
@@ -201,12 +201,12 @@ def rm(event):
     nr = 0
     got = []
     db = Db()
-    for o in db.find("bot.rss.Rss", selector):
+    for o in db.find("rssbot.Rss", selector):
         nr += 1
         o._deleted = True
         got.append(o)
     for o in got:
-        o.save()
+        save(o)
     event.reply("ok")
 
 def display(event):
@@ -215,9 +215,9 @@ def display(event):
         return
     setter = {"display_list": event.args[1]}
     db = Db()
-    for o in db.find("bot.rss.Rss", {"rss": event.args[0]}):
+    for o in db.find("rssbot.Rss", {"rss": event.args[0]}):
         edit(o, setter)
-        o.save()
+        save(o)
     event.reply("ok")
 
 def feed(event):
@@ -228,19 +228,19 @@ def feed(event):
     nr = 0
     diff = time.time() - to_time(day())
     db = Db()
-    res = list(db.find("bot.rss.Feed", {"link": match}, delta=-diff))
+    res = list(db.find("rssbot.Feed", {"link": match}, delta=-diff))
     for o in res:
         if match:
             event.reply("%s %s - %s - %s - %s" % (nr, o.title, o.summary, o.updated or o.published or "nodate", o.link))
         nr += 1
     if nr:
         return
-    res = list(db.find("bot.rss.Feed", {"title": match}, delta=-diff))
+    res = list(db.find("rssbot.Feed", {"title": match}, delta=-diff))
     for o in res:
         if match:
             event.reply("%s %s - %s - %s" % (nr, o.title, o.summary, o.link))
         nr += 1
-    res = list(db.find("bot.rss.Feed", {"summary": match}, delta=-diff))
+    res = list(db.find("rssbot.Feed", {"summary": match}, delta=-diff))
     for o in res:
         if match:
             event.reply("%s %s - %s - %s" % (nr, o.title, o.summary, o.link))
@@ -265,18 +265,18 @@ def rss(event):
     db = Db()
     if not event.args or "http" not in event.args[0]:
         nr = 0
-        for o in db.find("bot.rss.Rss", {"rss": ""}):
+        for o in db.find("rssbot.Rss", {"rss": ""}):
             event.reply("%s %s" % (nr, o.rss))
             nr += 1
         if not nr:
             event.reply("rss <url>")
         return
     url = event.args[0]
-    res = list(db.find("bot.rss.Rss", {"rss": url}))
+    res = list(db.find("rssbot.Rss", {"rss": url}))
     if res:
         event.reply("feed is already known.")
         return
     o = Rss()
     o.rss = event.args[0]
-    o.save()
+    save(o)
     event.reply("ok")

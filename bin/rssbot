@@ -11,7 +11,9 @@ def main():
         k.walk("bot")
         return k.cmd(c.origtxt)
     k.start()
-    k.init("irc,bot.rss,csl,shw")
+    k.init("irc,rssbot,cmd")
+    if "s" in c.opts:
+        k.init("csl")
     k.wait()
 
 execute(main)
