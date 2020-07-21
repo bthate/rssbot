@@ -9,6 +9,7 @@ def main():
     c = parse_cli("rssbot")
     if get(c, "txt", None):
         k.walk("bot")
+        k.load_mod("rssbot")
         return k.cmd(c.origtxt)
     k.start()
     k.init("irc,rssbot,cmd")
