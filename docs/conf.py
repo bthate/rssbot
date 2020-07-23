@@ -72,8 +72,8 @@ html_show_copyright = False
 html_copy_source = True
 html_use_opensearch = 'http://rssbot.rtfd.io/'
 html_file_suffix = '.html'
-rst_prolog = """.. image:: rssbotline.png
-    :height: 3cm
+rst_prolog = """.. image:: rssbotline2.png
+    :height: 2.5cm
     :width: 100%
 
 .. title:: no copyright, no LICENSE, placed in the public domain
