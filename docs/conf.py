@@ -1,20 +1,17 @@
-#!/usr/bin/python3
 # -*- coding: utf-8 -*-
+#
 
 import unittest
 import doctest
 import sys
 import os
 
-sys.path.insert(0, os.getcwd())
-sys.path.insert(0, os.path.join(os.getcwd(), ".."))
+curdir = os.getcwd()
+sys.path.insert(0, curdir + os.sep)
+sys.path.insert(0, curdir + os.sep + '..' + os.sep)
+sys.path.insert(0, curdir + os.sep + '..' + os.sep + ".." + os.sep)
 
-os.environ['PYTHONPATH'] = os.path.abspath(os.getcwd())
-
-try:
-    from rssbot import __version__
-except:
-    __version__ = "noversion"
+from bot.krn import __version__
 
 needs_sphinx='1.1'
 nitpick_ignore=[
@@ -28,23 +25,23 @@ extensions=[
     'sphinx.ext.intersphinx',
     'sphinx.ext.viewcode',
 ]
-
 autosummary_generate=True
-autodoc_default_flags=['members', 'undoc-members', 'private-members', "imported-members", "show-inheritence"]
-autodoc_member_order='bysource'
+#autodoc_default_flags=['members', 'undoc-members', 'private-members', 'special-members', 'inherited-members', 'show-inheritance', 'ignore-module-all', 'exclude-members']
+autodoc_default_flags=['members', 'undoc-members', 'private-members', "imported-members", 'show-inheritance', 'ignore-module-all']
+autodoc_member_order='alphabetical'
+autodoc_member_order='groupwise'
 autodoc_docstring_signature=True
 autoclass_content="class"
 doctest_global_setup=""
 doctest_global_cleanup=""
 doctest_test_doctest_blocks="default"
 trim_doctest_flags=True
-doctest_default_flags=doctest.REPORT_NDIFF & doctest.ELLIPSIS
+doctest_flags=doctest.REPORT_UDIFF
 templates_path=['_templates',]
 source_suffix = '.rst'
 source_encoding = 'utf-8-sig'
 master_doc = 'index'
-project = "rssbot"
-copyright = 'Bart Thate'
+project = "R S S B O T"
 version = '%s' % __version__
 release = '%s' % __version__
 language = ''
@@ -59,12 +56,9 @@ pygments_style = 'sphinx'
 modindex_common_prefix = [""]
 keep_warnings = True
 html_theme = "haiku"
-#html_theme_options = {
-#     "nosidebar": True,
-#}
 html_theme_path = []
-html_short_title = "RSSBOT %s" % __version__
-html_favicon = "jpg/smile.jpg"
+html_short_title = ""
+html_favicon = "rssbotsmile.png"
 html_static_path = []
 html_extra_path = []
 html_last_updated_fmt = '%Y-%b-%d'
@@ -74,12 +68,36 @@ html_use_index = True
 html_split_index = True
 html_show_sourcelink = False
 html_show_sphinx = False
-html_show_copyright = True
-html_copy_source = False
-html_use_opensearch = 'http://rssbot.rtfd.io'
+html_show_copyright = False
+html_copy_source = True
+html_use_opensearch = 'http://rssbot.rtfd.io/'
 html_file_suffix = '.html'
+rst_prolog = """.. image:: rssbotline2.png
+    :height: 2.5cm
+    :width: 100%
+
+.. title:: no copyright, no LICENSE, placed in the public domain
+
+"""
 htmlhelp_basename = 'pydoc'
 intersphinx_mapping = {
                        'python': ('https://docs.python.org/3', None),
                       }
-intersphinx_cache_limit=1
+intersphinx_cache_limit=2
+latex_elements = {
+    # The paper size ('letterpaper' or 'a4paper').
+    #
+    'papersize': 'letterpaper',
+
+    # The font size ('10pt', '11pt' or '12pt').
+    #
+    'pointsize': '10pt',
+
+    # Additional stuff for the LaTeX preamble.
+    #
+    'preamble': '',
+
+    # Latex figure (float) alignment
+    #
+    'figure_align': 'htbp',
+}

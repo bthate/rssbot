@@ -1,85 +1,20 @@
 #!/usr/bin/python3 -u
+# RSSBOT - display feeds in your IRC channel
+#
+#
 
-import json
-import ob
-import ob.evt
-import os
-import time
-import threading
-
-from ob import k, __version__
-from ob.csl import Console
-from ob.shl import enable_history, execute, hd, parse_cli, set_completer, writepid
-from ob.tms import elapsed
-from ob.trm import reset
-from ob.utl import get_name
-
-ob.evt.aliases = {
-           "c": "cmds",
-           "cfg": "show cfg",
-           "f": "find",
-           "l": "log",
-           "ps": "show tasks",
-           "t": "todo",
-           "u": "show uptime",
-           "v": "show version"
-           }
-
-opts = [
-    ('-b', '', 'store_true', False, 'daemon', 'background mode.'),
-    ('-d', '', 'string', "", 'workdir', 'set working directory.'),
-    ('-m', '', 'string', '', 'modules', 'modules to load.'),
-    ('-x', '', 'store_true', False, 'exec', 'execute command.'),
-    ('-o', '', "string", "", 'options', "options to use."),
-    ('-k', '', "store_true", False, "kernel", "read from previous kernel config."),
-    ('-p', '', "store_false", True, "prompting", "prompt for initial values."),
-    ('-s', '', 'store_true', False, 'dosave', 'save configuration files.'),
-    ('-z', '', 'store_false', True, 'shell', 'disable shell.'),
-    ('-l', '', 'string', '', 'level', 'loglevel.'),
-    ('', '--logdir', "string", "", 'logdir', "directory to find the logfiles."),
-]
-
-def boot():
-    k.init(k.cfg.modules)
-    if k.cfg.exec:
-        k.cmd(k.cfg.txt)
-        return
-    if k.cfg.kernel:
-        p = ob.last(k.cfg)
-    elif k.cfg.dosave:
-        k.cfg.save()
-    set_completer(k.cmds)
-    enable_history()
-    writepid()
-    k.start()
-    if k.cfg.kernel or k.cfg.shell:
-        c = Console()
-        k.add(c)
-        c.start()
-        k.wait()
-
-def daemon():
-    pid = os.fork()
-    if pid != 0:
-        reset()
-        os._exit(0)
-    os.setsid()
-    os.umask(0)
-    si = open("/dev/null", 'r')
-    so = open("/dev/null", 'a+')
-    se = open("/dev/null", 'a+')
-    os.dup2(si.fileno(), sys.stdin.fileno())
-    os.dup2(so.fileno(), sys.stdout.fileno())
-    os.dup2(se.fileno(), sys.stderr.fileno())
+from bot.spc import execute, get, k , parse_cli
 
 def main():
-    parse_cli("rssbot", __version__, opts, hd(".rssbot"), """ rssbot [-b] [-k] [-p] [-z] [-x cmd] [options] <server> <channel> <nick> """)
-    if k.cfg.daemon:
-        daemon()
-    k.walk("rssbot")
-    if not k.cfg.exec and not k.init("obot.irc"):
-        return
-    boot()
+    c = parse_cli("rssbot")
+    if get(c, "txt", None):
+        k.walk("bot")
+        k.load_mod("rssbot")
+        return k.cmd(c.origtxt)
+    k.start()
+    k.init("irc,rssbot,cmd")
+    if "s" in c.opts:
+        k.init("csl")
+    k.wait()
 
 execute(main)
-os._exit(0)

@@ -1,77 +1,86 @@
-__version__ = 22
+# RSSBOT - display rss feeds in your irc channel
+#
+#
 
-import datetime
-import io
-import logging
-import ob
-import obot
-import os
-import random
-import re
-import time
-import urllib
+import datetime, html.parser, os, random, re, time, urllib
+
+from urllib.error import HTTPError, URLError
+from urllib.parse import quote_plus, urlencode
+from urllib.request import Request, urlopen
+
+from bot.cfg import Cfg
+from bot.clk import Repeater
+from bot.dbs import Db, last
+from bot.dft import Default
+from bot.krn import k
+from bot.obj import Object, get, save, update
+from bot.opr import edit
+from bot.tsk import launch
+from bot.tms import to_time, day
+
+def __dir__():
+    return ("Cfg", "Rss", "Fetcher", "cmds", "display", "feed", "fetch", "rm", "rss")
 
 try:
     import feedparser
+    gotparser = True
 except ModuleNotFoundError:
-    feedparser = None
-    
-from ob import Object, k, last
-from ob.clk import Repeater
-from ob.cls import Cfg
-from ob.cls import Default
-from ob.pst import Persist
-from ob.tms import day, to_time
-from ob.utl import get_url, strip_html, unescape
+    gotparser = False
 
-def __dir__():
-    return ("Cfg", "Feed", "Fetcher", "Rss", "Seen", "delete" ,"display", "feed", "fetch", "init", "rss")
+debug = False
 
-def init():
-    fetcher.start()
-    return fetcher
+def init(kernel):
+    f = Fetcher()
+    f.start()
+    return f
 
 class Cfg(Cfg):
 
-    def __init__(self):
-        super().__init__()
-        self.display_list = ["title", "link"]
-        self.dosave = True
+    pass
 
-class Feed(Default):
+class Feed(Object):
 
     pass
 
-class Rss(Persist):
+class Rss(Object):
 
     def __init__(self):
         super().__init__()
         self.rss = ""
 
-class Seen(Persist):
+class Seen(Object):
 
     def __init__(self):
         super().__init__()
         self.urls = []
 
-class Fetcher(Persist):
+class Fetcher(Object):
+
+    cfg = Cfg()
+    seen = Seen()
 
     def __init__(self):
         super().__init__()
-        self.cfg = Cfg()
-        self.seen = Seen()
         self._thrs = []
 
     def display(self, o):
-        result = ""
+        dl = []
         try:
-            dl = o.display_list
+            dl = o.display_list.split(",")
         except AttributeError:
             pass
         if not dl:
-            dl = self.cfg.display_list
+            dl = self.cfg.display_list.split(",")
+        if not dl or not dl[0]:
+            dl = ["title", "link"]
         for key in dl:
-            data = ob.get(o, key, None)
+            if not key:
+                continue
+            data = get(o, key, None)
+            if key == "link" and self.cfg.tinyurl:
+                datatmp = get_tinyurl(data)
+                if datatmp:
+                    data = datatmp[0]
             if data:
                 data = data.replace("\n", " ")
                 data = strip_html(data.rstrip())
@@ -88,48 +97,39 @@ class Fetcher(Persist):
         for o in reversed(list(get_feed(obj.rss))):
             if not o:
                 continue
-            feed = Feed()
-            ob.update(feed, o)
-            ob.update(feed, obj)
-            u = urllib.parse.urlparse(feed.link)
-            url = "%s://%s/%s" % (u.scheme, u.netloc, u.path)
-            if url in self.seen.urls:
+            f = Feed()
+            update(f, obj)
+            update(f, o)
+            u = urllib.parse.urlparse(f.link)
+            if u.path and not u.path == "/":
+                url = "%s://%s/%s" % (u.scheme, u.netloc, u.path)
+            else:
+                url = f.link
+            if url in Fetcher.seen.urls:
                 continue
-            self.seen.urls.append(url)
+            Fetcher.seen.urls.append(url)
             counter += 1
-            objs.append(feed)
+            objs.append(f)
             if self.cfg.dosave:
-                try:
-                    date = file_time(to_time(feed.published))
-                except:
-                    date = False
-                if date:
-                    feed.save(stime=date)
-                else:
-                    feed.save()
-        self.seen.save()
+                save(f)
+        if objs:
+            save(Fetcher.seen)
         for o in objs:
             k.fleet.announce(self.display(o))
         return counter
 
-    def join(self):
-        for thr in self._thrs:
-            thr.join()
-
     def run(self):
-        res = []
         thrs = []
-        for o in k.db.all("rssbot.Rss"):
-            thrs.append(k.launch(self.fetch, o))
-        for thr in thrs:
-            res.append(thr.join())
-        return res
+        db = Db()
+        for o in db.all("rssbot.Rss"):
+            thrs.append(launch(self.fetch, o))
+        return thrs
 
     def start(self, repeat=True):
-        last(self.cfg)
-        last(self.seen)
+        last(Fetcher.cfg)
+        last(Fetcher.seen)
         if repeat:
-            repeater = Repeater(600, self.run)
+            repeater = Repeater(300.0, self.run)
             repeater.start()
             return repeater
 
@@ -155,3 +155,144 @@ def get_feed(url):
 
 def file_time(timestamp):
     return str(datetime.datetime.fromtimestamp(timestamp)).replace(" ", os.sep) + "." + str(random.randint(111111, 999999))
+
+def get_feed(url):
+    if debug:
+        return [Object(), Object()]
+    try:
+        result = get_url(url)
+    except (HTTPError, URLError):
+        return [Object(), Object()]
+    if gotparser:
+        res = feedparser.parse(result.data)
+        if "entries" in res:
+            for entry in res["entries"]:
+                yield entry
+    else:
+        print("feedparser is missing")
+        return [Object(), Object()]
+
+def get_tinyurl(url):
+    postarray = [
+        ('submit', 'submit'),
+        ('url', url),
+        ]
+    postdata = urlencode(postarray, quote_via=quote_plus)
+    req = Request('http://tinyurl.com/create.php', data=bytes(postdata, "UTF-8"))
+    req.add_header('User-agent', useragent())
+    for txt in urlopen(req).readlines():
+        line = txt.decode("UTF-8").strip()
+        i = re.search('data-clipboard-text="(.*?)"', line, re.M)
+        if i:
+            return i.groups()
+    return []
+
+def get_url(url):
+    url = urllib.parse.urlunparse(urllib.parse.urlparse(url))
+    req = urllib.request.Request(url)
+    req.add_header('User-agent', useragent())
+    response = urllib.request.urlopen(req)
+    response.data = response.read()
+    return response
+
+def strip_html(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
+
+def unescape(text):
+    txt = re.sub(r"\s+", " ", text)
+    return html.parser.HTMLParser().unescape(txt)
+
+def useragent():
+    return 'Mozilla/5.0 (X11; Linux x86_64) RSSBOT +http://bitbucket.org/bthate/rssbot)'
+
+def cmd(event):
+    event.reply("|".join(sorted(k.cmds)))
+
+def rm(event):
+    if not event.args:
+        event.reply("rm <match>")
+        return
+    selector = {"rss": event.args[0]}
+    nr = 0
+    got = []
+    db = Db()
+    for o in db.find("rssbot.Rss", selector):
+        nr += 1
+        o._deleted = True
+        got.append(o)
+    for o in got:
+        save(o)
+    event.reply("ok")
+
+def display(event):
+    if len(event.args) < 2:
+        event.reply("display <feed> key1,key2,etc.")
+        return
+    setter = {"display_list": event.args[1]}
+    db = Db()
+    for o in db.find("rssbot.Rss", {"rss": event.args[0]}):
+        edit(o, setter)
+        save(o)
+    event.reply("ok")
+
+def feed(event):
+    if not event.args:
+        event.reply("feed <match>")
+        return
+    match = event.args[0]
+    nr = 0
+    diff = time.time() - to_time(day())
+    db = Db()
+    res = list(db.find("rssbot.Feed", {"link": match}, delta=-diff))
+    for o in res:
+        if match:
+            event.reply("%s %s - %s - %s - %s" % (nr, o.title, o.summary, o.updated or o.published or "nodate", o.link))
+        nr += 1
+    if nr:
+        return
+    res = list(db.find("rssbot.Feed", {"title": match}, delta=-diff))
+    for o in res:
+        if match:
+            event.reply("%s %s - %s - %s" % (nr, o.title, o.summary, o.link))
+        nr += 1
+    res = list(db.find("rssbot.Feed", {"summary": match}, delta=-diff))
+    for o in res:
+        if match:
+            event.reply("%s %s - %s - %s" % (nr, o.title, o.summary, o.link))
+        nr += 1
+    if not nr:
+        event.reply("no results found")
+
+def fetch(event):
+    res = []
+    thrs = []
+    fetcher = Fetcher()
+    fetcher.start(False)
+    thrs = fetcher.run()
+    for thr in thrs:
+        res.append(thr.join() or 0)
+    if res:
+        event.reply("fetched %s" % ",".join([str(x) for x in res]))
+        return
+    event.reply("no feeds registered.")
+
+def rss(event):
+    db = Db()
+    if not event.args or "http" not in event.args[0]:
+        nr = 0
+        for o in db.find("rssbot.Rss", {"rss": ""}):
+            event.reply("%s %s" % (nr, o.rss))
+            nr += 1
+        if not nr:
+            event.reply("rss <url>")
+        return
+    url = event.args[0]
+    res = list(db.find("rssbot.Rss", {"rss": url}))
+    if res:
+        event.reply("feed is already known.")
+        return
+    o = Rss()
+    o.rss = event.args[0]
+    save(o)
+    event.reply("ok")

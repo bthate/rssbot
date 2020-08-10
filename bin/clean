@@ -1,1 +1,1 @@
-rm -fR runob testdata runob.tar.gz history _build build envs dist rssbot.egg-info *~ docs/*~ bin/*~ rssbot/*~ mods/*~ rssbot/__pycache__ docs/code/ docs/html docs/obj
+rm -fR rssbot/*~ rssbot/__pycache__ docs/rssbot.rst docs/*~ docs/bot* dist env html rssbot.egg-info build dist MANIFEST bot/*~ bot/__pycache__ bin/*~ *~

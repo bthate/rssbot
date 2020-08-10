@@ -1,35 +1,26 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# RSSBOT - display rss feeds into your irc channel
 #
-# RSSBOT - bot you can use to display RSS feeds.
-
-""" setup.py """
+#
 
 from setuptools import setup
 
+def read():
+    return open("README.rst", "r").read()
+
 setup(
     name='rssbot',
-    version='22',
-    url='https://github.com/bthate/rssbot',
+    version='31',
+    url='https://bitbucket.org/bthate/rssbot',
     author='Bart Thate',
-    author_email='bthate@dds.nl',
-    description="IRC bot you can use to display RSS feeds.",
-    long_description="""RSSBOT is a IRC bot you can use to display RSS feeds.
-RSSBOT is in the Public Domain and contains no copyright or LICENSE.
-
-1) pip3 install rssbot
-2) rssbot <server> <channel> <nick> 
-3) !rss <url>
-4) !fetch
-
-    """,
-    long_description_content_type="text/markdown",
+    author_email='bthate@dds.nl', 
+    description=""" RSSBOT - display rss feeds in your IRC channel. """,
+    long_description=read(),
     license='Public Domain',
-    zip_safe=True,
-    install_requires=["obot", "feedparser"],
-    scripts=["bin/rssbot"],
+    install_requires=["botlib", "feedparser"],
+    zip_safe=False,
     packages=["rssbot"],
-    classifiers=['Development Status :: 3 - Alpha',
+    scripts=["bin/rssbot"],
+    classifiers=['Development Status :: 4 - Beta',
                  'License :: Public Domain',
                  'Operating System :: Unix',
                  'Programming Language :: Python',
