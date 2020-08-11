@@ -14,7 +14,7 @@ def main():
     k.start()
     k.init("irc,rssbot,cmd")
     if "s" in c.opts:
-        k.init("csl")
+        k.init("csl,opr")
     k.wait()
 
 execute(main)
