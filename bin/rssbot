@@ -23,7 +23,7 @@ def daemon():
     os.dup2(se.fileno(), sys.stderr.fileno())
 
 def main():
-    ol.wd = os.path.expanduser("~/.rssobt")
+    ol.wd = os.path.expanduser("~/.rssbot")
     k = boot("rssbot")
     if "b" in k.cfg.opts:
         print("RSSBOT started at %s" % time.ctime(time.time()))
@@ -37,8 +37,9 @@ def main():
         c.start()
     k.start()
     k.init(k.cfg.mods, k.cfg.exc)
-    i = IRC()
-    i.start()
+    if "i" in k.cfg.opts:
+        i = IRC()
+        i.start()
     if "s" in k.cfg.opts or "d" in k.cfg.opts:
         k.wait()
          
