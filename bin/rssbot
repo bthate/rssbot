@@ -1,20 +1,42 @@
-#!/usr/bin/python3 -u
-# RSSBOT - display feeds in your IRC channel
+#!/usr/bin/python3
+# RSSBOT
 #
 #
 
-from bot.spc import execute, get, k , parse_cli
+from ol.spc import Console, boot, cmd, execute, ol, privileges, root, scandir
+from ol.spc import os, pwd, sys, time 
+
+def daemon():
+    pid = os.fork()
+    if pid != 0:
+        ol.trm.termreset()
+        os._exit(0)
+    os.setsid()
+    os.umask(0)
+    si = open("/dev/null", 'r')
+    so = open("/dev/null", 'a+')
+    se = open("/dev/null", 'a+')
+    os.dup2(si.fileno(), sys.stdin.fileno())
+    os.dup2(so.fileno(), sys.stdout.fileno())
+    os.dup2(se.fileno(), sys.stderr.fileno())
 
 def main():
-    c = parse_cli("rssbot")
-    if get(c, "txt", None):
-        k.walk("bot")
-        k.load_mod("rssbot")
-        return k.cmd(c.origtxt)
+    ol.wd = os.path.join(os.getcwd())
+    k = boot("rssbot")
+    if "b" in k.cfg.opts:
+        print("RSSBOT started at %s" % time.ctime(time.time()))
+        print(ol.format(k.cfg))
+    if "d" in k.cfg.opts:
+        daemon()
+    if k.cfg.txt:
+        return cmd(k.cfg.otxt)
+    if "s" in k.cfg.opts:
+        c = Console()
+        c.start()
     k.start()
-    k.init("irc,rssbot,cmd")
-    if "s" in c.opts:
-        k.init("csl,opr")
-    k.wait()
-
+    k.init(k.cfg.mods, k.cfg.exc)
+    if "s" in k.cfg.opts or "d" in k.cfg.opts:
+        k.wait()
+         
 execute(main)
+os._exit(0)
