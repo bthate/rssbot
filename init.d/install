@@ -1,7 +1,0 @@
-[ ! -d "/var/log/rssbot" ] && mkdir /var/log/rssbot
-[ ! -d "/var/lib/rssbot" ] && mkdir /var/lib/rssbot
-cp init.d/rssbot.service /etc/systemd/system
-systemctl enable rssbot
-systemctl daemon-reload
-service rssbot start
-systemctl status rssbot

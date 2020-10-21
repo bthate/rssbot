@@ -21,7 +21,7 @@ def daemon():
     os.dup2(se.fileno(), sys.stderr.fileno())
 
 def main():
-    ol.wd = os.path.join(os.getcwd())
+    ol.wd = os.path.expanduser("~/.rssobt")
     k = boot("rssbot")
     if "b" in k.cfg.opts:
         print("RSSBOT started at %s" % time.ctime(time.time()))

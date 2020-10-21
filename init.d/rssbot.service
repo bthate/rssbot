@@ -1,8 +1,0 @@
-[Unit]
-Description=rssbot
-
-[Service]
-ExecStart=/usr/local/bin/rssbot -k -d /var/lib/rssbot --logdir /var/log/rssbot -p -l debug
-
-[Install]
-WantedBy=multi-user.target
