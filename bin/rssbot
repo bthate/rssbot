@@ -6,6 +6,8 @@
 from ol.spc import Console, boot, cmd, execute, ol, privileges, root, scandir
 from ol.spc import os, pwd, sys, time 
 
+from bot.irc import IRC
+
 def daemon():
     pid = os.fork()
     if pid != 0:
@@ -35,6 +37,8 @@ def main():
         c.start()
     k.start()
     k.init(k.cfg.mods, k.cfg.exc)
+    i = IRC()
+    i.start()
     if "s" in k.cfg.opts or "d" in k.cfg.opts:
         k.wait()
          
