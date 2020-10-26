@@ -9,11 +9,11 @@ def read():
 
 setup(
     name='rssbot',
-    version='33',
+    version='34',
     url='https://bitbucket.org/bthate/rssbot',
     author='Bart Thate',
     author_email='bthate@dds.nl', 
-    description=""" RSSBOT - display rss feeds in your IRC channel. """,
+    description="""display rss feeds in your IRC channel""",
     long_description=read(),
     license='Public Domain',
     install_requires=["botlib", "feedparser"],
