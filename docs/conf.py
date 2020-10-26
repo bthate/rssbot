@@ -57,7 +57,7 @@ modindex_common_prefix = [""]
 keep_warnings = True
 html_theme = "haiku"
 html_theme_path = []
-html_short_title = ""
+html_short_title = "RSSBOT %s" % __version__
 html_favicon = "rssbotsmile.png"
 html_static_path = []
 html_extra_path = []
@@ -77,8 +77,13 @@ rst_prolog = """.. image:: rssbotline2.png
     :width: 100%
 
 .. title:: no copyright, no LICENSE, placed in the public domain
-
 """
+rst_epilog = """.. image:: rssbotsmile.png
+    :align: center
+    :height: 2.5cm
+"""
+
+
 htmlhelp_basename = 'pydoc'
 intersphinx_mapping = {
                        'python': ('https://docs.python.org/3', None),

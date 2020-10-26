@@ -30,7 +30,7 @@ first:
 
  $ sudo groupadd rssbot
  $ sudo mkdir /var/lib/rssbot
- $ sudo useradd rssbot -g rssbot -d /var/lib/rssbot")
+ $ sudo useradd rssbot -g rssbot -d /var/lib/rssbot
 
 to up some more security, set strict permissions on the work directory:
 

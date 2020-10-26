@@ -18,7 +18,7 @@ you can do this by copying the following into the /etc/systemd/system/rssbot.ser
  Wants=network-online.target
  
  [Service]
- ExecStart=/usr/local/bin/rssbot
+ ExecStart=/usr/local/bin/rssbot 
  
  [Install]
  WantedBy=multi-user.target

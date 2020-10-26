@@ -3,7 +3,7 @@
 SOURCE
 ######
 
-genocide is written in pure python3, here is the code used:
+rssbot is written in pure python3, here is the code used:
 
 olib
 ====
