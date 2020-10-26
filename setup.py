@@ -17,6 +17,7 @@ setup(
     long_description=read(),
     license='Public Domain',
     install_requires=["botlib", "feedparser"],
+    packages=["rssbot"],
     zip_safe=True,
     scripts=["bin/rssbot"],
     classifiers=['Development Status :: 4 - Beta',

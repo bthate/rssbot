@@ -11,7 +11,7 @@ sys.path.insert(0, curdir + os.sep)
 sys.path.insert(0, curdir + os.sep + '..' + os.sep)
 sys.path.insert(0, curdir + os.sep + '..' + os.sep + ".." + os.sep)
 
-from bot.krn import __version__
+from rssbot import __version__
 
 needs_sphinx='1.1'
 nitpick_ignore=[
@@ -41,7 +41,7 @@ templates_path=['_templates',]
 source_suffix = '.rst'
 source_encoding = 'utf-8-sig'
 master_doc = 'index'
-project = "R S S B O T"
+project = "RSSBOT"
 version = '%s' % __version__
 release = '%s' % __version__
 language = ''

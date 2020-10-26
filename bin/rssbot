@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from ol.spc import Console, boot, cmd, execute, ol, os, scandir
+from bot.irc import IRC
 
 def main():
     k = boot("rssbot")
@@ -13,11 +14,11 @@ def main():
         return cmd(k.cfg.otxt)
     k.start()
     k.init(k.cfg.mods)
-    if "s" in k.cfg.opts or k.cfg.mods:
-        c = Console()
-        c.start()
-    if "s" in k.cfg.opts or "d" in k.cfg.opts or k.cfg.mods:
-        k.wait()
+    i = IRC()
+    i.start()
+    c = Console()
+    c.start()
+    k.wait()
          
 execute(main)
 os._exit(0)
