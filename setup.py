@@ -9,7 +9,7 @@ def read():
 
 setup(
     name='rssbot',
-    version='34',
+    version='35',
     url='https://bitbucket.org/bthate/rssbot',
     author='Bart Thate',
     author_email='bthate@dds.nl', 
