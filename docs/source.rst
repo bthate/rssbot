@@ -1,62 +1,25 @@
 .. _source:
 
 SOURCE
-######
-
-rssbot is written in pure python3, here is the code used:
-
-olib
-====
-
-.. autosummary::
-    :toctree: 
-    :template: module.rst
-
-    ol          - object library
-    ol.bus      - announce
-    ol.csl      - console
-    ol.dbs      - databases
-    ol.evt	- event
-    ol.hdl      - handler
-    ol.int	- introspection
-    ol.krn      - kernel
-    ol.prs      - parser
-    ol.spc	- specification
-    ol.tms      - times
-    ol.trm      - terminal
-    ol.tsk      - tasks
-    ol.utl      - utilities
-
-
-bot
-===
-
-.. autosummary::
-    :toctree: 
-    :template: module.rst
-
-    bot.cfg	- configuration
-    bot.cmd	- commands
-    bot.irc	- internet relay chat
-
-botmod
 ======
 
-.. autosummary::
-    :toctree: 
-    :template: module.rst
-
-    botmod.ent	- data entry
-    botmod.fnd	- find objects
-    botmod.mbx 	- mailbot
-    botmod.rss 	- rich site syndicate
-    botmod.udp 	- udp to irc relay
-
-rssbot
-======
+BOTLIB provides the following modules:
 
 .. autosummary::
     :toctree: 
     :template: module.rst
 
-    rssbot.version	- version
+    bot.bus          - messaging
+    bot.clk          - clock/repeater
+    bot.cmd          - commands
+    bot.dbs          - databases
+    bot.hdl          - handler
+    bot.irc          - internet relay chat
+    bot.obj          - objects
+    bot.ofn          - object functions
+    bot.prs          - parser
+    bot.rss          - rich site syndicate
+    bot.thr          - threads
+    #bot.tms	     - future events
+    bot.trm          - terminal
+    bot.udp          - udp to irc relay
