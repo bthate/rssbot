@@ -1,1 +1,1 @@
-rm -fR rssrun rssrun.tar.gz rssbot/*~ rssbot/__pycache__ docs/rssbot.rst docs/*~ docs/bot* dist env html rssbot.egg-info build dist MANIFEST bot/*~ bot/__pycache__ bin/*~ *~
+rm -fR test/*~ test/__pycache__ build *~ botd.egg-info bot/*~ bot/__pycache__ run run.tar.gz html env env.tar.gz .data build dist MANIFEST bin/*~ *~ docs/*~

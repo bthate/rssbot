@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+
+import os, sys ; sys.path.insert(0, os.getcwd())
+import time, unittest
+
+import bot.obj
+import bot.hdl
+
+from bot.trm import execute
+from bot.prs import parse_cli
+
+def open(txt):
+    try:
+        for line in os.popen(txt).readlines():
+            print(line.rstrip())
+    except:
+        pass
+
+def main():
+    open("rm -fR ~/.test")
+    bot.obj.wd = os.path.expanduser("~/.test")
+    bot.hdl.debug = True
+    cfg = parse_cli()
+    test_path = os.getcwd() + os.sep + "test"
+    if cfg.txt:
+        pat = "test_%s*" % cfg.txt
+    else:
+        pat = "test*"
+    suite = unittest.loader.TestLoader().discover(test_path, pattern=pat)
+    unittest.TextTestRunner(verbosity=3).run(suite)
+   
+execute(main)
+os._exit(0)

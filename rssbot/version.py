@@ -1,9 +1,9 @@
 "rssbot version"
 
-import bot.cmd
-import ol
-import rssbot
+__version__ = 35
+
+import bot.hdl
 
 def ver(event):
     "show version (ver)"
-    event.reply("RSSBOT %s | BOTLIB %s | OLIB %s" % (rssbot.version, bot.cmd.__version__, ol.__version__))
+    event.reply("RSSBOT %s | BOTLIB %s" % (__version__, bot.hdl.__version__))
