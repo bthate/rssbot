@@ -78,10 +78,6 @@ rst_prolog = """.. image:: rssbotline2.png
 
 .. title:: no copyright, no LICENSE, placed in the public domain
 """
-rst_epilog = """.. image:: rssbotsmile.png
-    :align: center
-    :height: 2cm
-"""
 
 
 htmlhelp_basename = 'pydoc'
