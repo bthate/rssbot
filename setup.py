@@ -18,7 +18,7 @@ setup(
     license='Public Domain',
     install_requires=["botlib", "feedparser"],
     packages=["rssbot"],
-    zip_safe=True,
+    zip_safe=False,
     scripts=["bin/rssbot"],
     classifiers=['Development Status :: 4 - Beta',
                  'License :: Public Domain',
