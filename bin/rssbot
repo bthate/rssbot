@@ -7,9 +7,8 @@ import os, sys ; sys.path.insert(0, os.getcwd())
 
 import atexit, os, pwd, readline, sys
 
-from bot.bus import bus
 from bot.hdl import Command, Handler, cmd
-from bot.ofn import format
+from bot.obj import format
 from bot.prs import parse_cli
 from bot.thr import launch
 from bot.trm import execute, termsave, termreset
@@ -97,8 +96,7 @@ def main():
         h = Handler()
     else:
         h = Console()
-    h.walk("bot")
-    h.walk("rssbot", "rssbot")
+    h.walk("rssbot")
     if cfg.txt:
         return h.cmd(cfg.otxt)
     h.init(cfg.sets.mods)
