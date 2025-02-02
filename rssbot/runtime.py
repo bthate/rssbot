@@ -13,7 +13,7 @@ import traceback
 import _thread
 
 
-from .clients import Client, Config, debug, output
+from .clients import Client, Config, debug
 from .command import Commands, command, parse
 from .encoder import dumps
 from .excepts import errors, later
@@ -34,7 +34,7 @@ pname = f"{Config.name}.modules"
 
 
 Workdir.wdr    = os.path.expanduser(f"~/.{Config.name}")
-clients.output = print
+clients.output = output = print
 
 
 class CLI(Client):

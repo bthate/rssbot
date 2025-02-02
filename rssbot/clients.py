@@ -4,6 +4,7 @@
 "clients"
 
 
+import os
 import queue
 import threading
 
@@ -15,8 +16,8 @@ from .threads import launch
 
 class Config(Default):
 
-    init = "irc,rss"
-    name = "rssbot"
+    init = "irc,mdl,rss"
+    name = __file__.rsplit(os.sep, maxsplit=2)[-2]
     opts = Default()
 
 
