@@ -20,7 +20,7 @@ loadlock = threading.RLock()
 
 class Table:
 
-    disable = ["dbg", "tmr"]
+    disable = ["tmr"]
     mods = {}
 
     @staticmethod
