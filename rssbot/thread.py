@@ -7,13 +7,13 @@
 import queue
 import threading
 import time
-import typing
+import _thread
 
 
-lock = threading.RLock()
+from .errors import later
 
 
-from .excepts import later
+STARTTIME = time.time()
 
 
 class Thread(threading.Thread):
@@ -28,42 +28,25 @@ class Thread(threading.Thread):
         self.queue.put((func, args))
 
     def run(self) -> None:
-        func, args = self.queue.get()
         try:
+            func, args = self.queue.get()
             self.result = func(*args)
         except Exception as ex:
             later(ex)
-            if args and "ready" in dir(args[0]):
+            try:
                 args[0].ready()
+            except (IndexError, AttributeError):
+                pass
+            _thread.interrupt_main()
 
-    def join(self, timeout=None) -> typing.Any:
+    def join(self, timeout=None):
         super().join(timeout)
         return self.result
 
 
-def launch(func, *args, **kwargs) -> Thread:
-    nme = kwargs.get("name", name(func))
-    thread = Thread(func, nme, *args, **kwargs)
-    thread.start()
-    return thread
-
-
-def name(obj) -> str:
-    typ = type(obj)
-    if '__builtins__' in dir(typ):
-        return obj.__name__
-    if '__self__' in dir(obj):
-        return f'{obj.__self__.__class__.__name__}.{obj.__name__}'
-    if '__class__' in dir(obj) and '__name__' in dir(obj):
-        return f'{obj.__class__.__name__}.{obj.__name__}'
-    if '__class__' in dir(obj):
-        return f"{obj.__class__.__module__}.{obj.__class__.__name__}"
-    if '__name__' in dir(obj):
-        return f'{obj.__class__.__name__}.{obj.__name__}'
-    return None
-
-
 class Timer:
+
+    """ timer """
 
     def __init__(self, sleep, func, *args, thrname=None, **kwargs):
         self.args   = args
@@ -76,7 +59,7 @@ class Timer:
 
     def run(self) -> None:
         self.state["latest"] = time.time()
-        launch(self.func, *self.args)
+        self.func(*self.args)
 
     def start(self) -> None:
         timer = threading.Timer(self.sleep, self.run)
@@ -101,14 +84,36 @@ class Repeater(Timer):
         super().run()
 
 
+def launch(func, *args, **kwargs) -> Thread:
+    nme = kwargs.get("name")
+    if not nme:
+        nme = name(func)
+    thread = Thread(func, nme, *args, **kwargs)
+    thread.start()
+    return thread
+
+
+def name(obj) -> str:
+    typ = type(obj)
+    if '__builtins__' in dir(typ):
+        return obj.__name__
+    if '__self__' in dir(obj):
+        return f'{obj.__self__.__class__.__name__}.{obj.__name__}'
+    if '__class__' in dir(obj) and '__name__' in dir(obj):
+        return f'{obj.__class__.__name__}.{obj.__name__}'
+    if '__class__' in dir(obj):
+        return f"{obj.__class__.__module__}.{obj.__class__.__name__}"
+    if '__name__' in dir(obj):
+        return f'{obj.__class__.__name__}.{obj.__name__}'
+    return None
+
+
 def __dir__():
     return (
-        'Errors',
+        'STARTTIME',
         'Repeater',
         'Thread',
         'Timer',
-        'errors',
-        'later',
         'launch',
         'name'
     )

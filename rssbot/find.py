@@ -1,24 +1,22 @@
 # This file is placed in the Public Domain.
 
 
-"find objects"
+"locate objects"
 
 
 import os
 import time
 
 
-from .caching import Cache
-from .objects import Object, fqn, items, update
-from .persist import read
-from .workdir import long, skel, store
+from .disk   import Cache, fqn, read
+from .object import Object, items, update
+from .path   import long, skel, store
 
 
 p = os.path.join
 
 
-def fns(clz):
-    dname = ''
+def fns(clz) -> [str]:
     pth = store(clz)
     for rootdir, dirs, _files in os.walk(pth, topdown=False):
         if dirs:
@@ -29,9 +27,9 @@ def fns(clz):
                         yield p(ddd, fll)
 
 
-def fntime(daystr):
-    daystr = daystr.replace('_', ':')
+def fntime(daystr) -> int:
     datestr = ' '.join(daystr.split(os.sep)[-2:])
+    datestr = datestr.replace("_", " ")
     if '.' in datestr:
         datestr, rest = datestr.rsplit('.', 1)
     else:
@@ -42,25 +40,25 @@ def fntime(daystr):
     return timed
 
 
-def find(clz, selector=None, deleted=False, matching=False):
+def find(clz, selector=None, deleted=False, matching=False) -> [Object]:
     skel()
-    pth = long(clz)
     res = []
-    for fnm in fns(pth):
-        obj = Cache.get(fnm)
+    clz = long(clz)
+    for pth in fns(clz):
+        obj = Cache.get(pth)
         if not obj:
             obj = Object()
-            read(obj, fnm)
-            Cache.add(fnm, obj)
+            read(obj, pth)
+            Cache.add(pth, obj)
         if not deleted and '__deleted__' in dir(obj) and obj.__deleted__:
             continue
         if selector and not search(obj, selector, matching):
             continue
-        res.append((fnm, obj))
+        res.append((pth, obj))
     return sorted(res, key=lambda x: fntime(x[0]))
 
 
-def last(obj, selector=None):
+def last(obj, selector=None) -> Object:
     if selector is None:
         selector = {}
     result = sorted(
@@ -75,7 +73,7 @@ def last(obj, selector=None):
     return res
 
 
-def search(obj, selector, matching=None):
+def search(obj, selector, matching=None) -> bool:
     res = False
     if not selector:
         return res
