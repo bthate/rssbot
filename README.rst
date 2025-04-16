@@ -24,6 +24,7 @@ R S S B O T
 background, hooking the daemon in systemd brings a 24/7 available
 rssbot in your channel.
 
+|
 
 **INSTALL**
 
@@ -100,7 +101,6 @@ opml
 | ``cfg`` - irc configuration
 | ``cmd`` - commands
 | ``dpl`` - sets display items
-| ``err`` - show errors
 | ``exp`` - export opml (stdout)
 | ``imp`` - import opml
 | ``mre`` - display cached output
@@ -109,8 +109,7 @@ opml
 | ``res`` - restore deleted feeds
 | ``rss`` - add a feed
 | ``syn`` - sync rss feeds
-| ``thr`` - show running threads
-| ``upt`` - show uptime
+| ``ver`` - show version
 |
 
 **FILES**
