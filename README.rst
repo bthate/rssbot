@@ -4,7 +4,6 @@ R S S B O T
 
 **NAME**
 
-
 |
 | ``rssbot`` - 24/7 Feed Fetcher.
 |
@@ -13,9 +12,7 @@ R S S B O T
 
 |
 | ``rssbot <cmd> [key=val] [key==val]``
-| ``rssbot -[cdvisw]``
 |
-
 
 **DESCRIPTION**
 
@@ -26,13 +23,6 @@ R S S B O T
 ``rssbot`` comes with a cli to configure and a daemon to run in the
 background, hooking the daemon in systemd brings a 24/7 available
 rssbot in your channel.
-
-
-*notes*
-
-1) if reinstall fails, try pip uninstall to start pristine.
-2) if that fails, install a fresh ``rssbot srv`` and reinstall.
-3) rssbots has been replaced with rssbot -s 
 
 
 **INSTALL**
@@ -48,7 +38,6 @@ installation is done with pipx
 |
 | ``$ rssbot srv > rssbot.service``
 | ``$ sudo mv rssbot.service /etc/systemd/system/``
-| ``$ sudo systemctl daemon-reload``
 | ``$ sudo systemctl enable rssbot --now``
 |
 | joins ``#rssbot`` on localhost
@@ -65,24 +54,11 @@ use ``rssbot`` to control the program, default it does nothing
 
 see list of commands
 
+|
 | ``$ rssbot cmd``
-| ``cfg,cmd,dne,dpl,err,exp,imp,mod,mre,nme,``
-| ``pwd,rem,res,rss,srv,syn,thr,upt``
+| ``cfg,dpl,exp,imp,mre,nme,pwd,rem,res,rss,syn``
 |
 
-start daemon
-
-|
-| ``$ rssbot -d``
-| ``$``
-|
-
-start service
-
-|
-| ``$ rssbot -s``
-| ``<runs until ctrl-c>``
-|
 
 **CONFIGURATION**
 
@@ -118,14 +94,6 @@ opml
 |
 
 
-**FILES**
-
-|
-| ``~/.rssbot``
-| ``~/.local/bin/rssbot``
-| ``~/.local/pipx/venvs/rssbot/*``
-|
-
 **COMMANDS**
 
 |
@@ -143,6 +111,14 @@ opml
 | ``syn`` - sync rss feeds
 | ``thr`` - show running threads
 | ``upt`` - show uptime
+|
+
+**FILES**
+
+|
+| ``~/.rssbot``
+| ``~/.local/bin/rssbot``
+| ``~/.local/pipx/venvs/rssbot/*``
 |
 
 **AUTHOR**
