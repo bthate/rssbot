@@ -11,12 +11,16 @@ import time
 import _thread
 
 
-from . import Client, Errors, Event, Workdir
-from . import dumps, full, pidname
+from .client  import Client
+from .handler import Event
+from .json    import dumps
+from .modules import Commands, Main, command, inits
+from .modules import md5sum, mods, modules, parse, scan, settable
+from .store   import Workdir, pidname
+from .thread  import Errors, full
 
 
-from .modules import Commands, Main, command, inits, md5sum
-from .modules import mods, modules, parse, scan, settable
+"clients"
 
 
 class CLI(Client):
@@ -32,6 +36,7 @@ class CLI(Client):
 class Console(CLI):
 
     def announce(self, txt):
+        #output(txt)
         pass
 
     def callback(self, evt):
@@ -43,6 +48,13 @@ class Console(CLI):
         evt.txt = input("> ")
         evt.type = "command"
         return evt
+
+
+"interrupt handler"
+
+
+def handler(signum, frame):
+    _thread.interrupt_main()
 
 
 "output"
@@ -69,13 +81,6 @@ def enable():
 def disable():
     global output
     output = nil
-
-
-"signals"
-
-
-def handler(signum, frame):
-    _thread.interrupt_main()
 
 
 "utilities"
@@ -180,7 +185,7 @@ def srv(event):
 def tbl(event):
     if not check("f"):
         Commands.names = {}
-    for mod in mods(empty=True):
+    for mod in mods():
         scan(mod)
     event.reply("# This file is placed in the Public Domain.")
     event.reply("")
@@ -225,7 +230,7 @@ def console():
         banner()
     for _mod, thr in inits(Main.init):
         if "w" in Main.opts:
-            thr.join()
+            thr.join(30.0)
     csl = Console()
     csl.start()
     forever()
@@ -264,7 +269,6 @@ def service():
     forever()
 
 
-
 "runtime"
 
 
@@ -290,25 +294,6 @@ def wrap(func):
             termios.tcsetattr(sys.stdin.fileno(), termios.TCSADRAIN, old)
 
 
-def main():
-    if check("a"):
-        Main.ignore = "udp"
-        Main.init   = ",".join(modules())
-        for mod in mods():
-            mod.DEBUG = False
-    if check("v"):
-        setattr(Main.opts, "v", True)
-        enable()
-    if check("c"):
-        wrap(console)
-    elif check("d"):
-        background()
-    elif check("s"):
-        wrapped(service)
-    else:
-        wrapped(control)
-
-
 "data"
 
 
@@ -327,6 +312,22 @@ WantedBy=multi-user.target"""
 
 
 "main"
+
+
+def main():
+    if check("a"):
+        Main.init   = ",".join(modules())
+    if check("v"):
+        setattr(Main.opts, "v", True)
+        enable()
+    if check("c"):
+        wrap(console)
+    elif check("d"):
+        background()
+    elif check("s"):
+        wrapped(service)
+    else:
+        wrapped(control)
 
 
 if __name__ == "__main__":

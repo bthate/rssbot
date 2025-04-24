@@ -19,9 +19,11 @@ from urllib.error import HTTPError, URLError
 from urllib.parse import quote_plus, urlencode
 
 
-from .. import Object, find, fntime, ident, last, store, update, write
-from .. import Repeater, launch
-from .  import Fleet, elapsed, fmt, spl
+from ..client import Fleet
+from ..object import Object, update
+from ..store  import find, fntime, last, path, write
+from ..thread import Repeater, launch
+from .        import elapsed, fmt, spl
 
 
 DEBUG = False
@@ -107,11 +109,11 @@ class Fetcher(Object):
                 if uurl in seen:
                     continue
                 if self.dosave:
-                    write(fed, store(ident(fed)))
+                    write(fed)
                 result.append(fed)
             setattr(self.seen, feed.rss, urls)
             if not self.seenfn:
-                self.seenfn = store(ident(self.seen))
+                self.seenfn = path(self.seen)
             write(self.seen, self.seenfn)
         if silent:
             return counter
@@ -187,9 +189,6 @@ class Parser:
                     setattr(obj, itm, val)
             result.append(obj)
         return result
-
-
-"utilities"
 
 
 def cdata(line):
@@ -333,7 +332,7 @@ def rss(event):
             return
     feed = Rss()
     feed.rss = event.args[0]
-    write(feed, store(ident(feed)))
+    write(feed)
     event.done()
 
 
@@ -417,9 +416,6 @@ class OPML:
         return result
 
 
-"utilities"
-
-
 def attrs(obj, txt):
     update(obj, OPML.parse(txt))
 
@@ -477,7 +473,7 @@ def imp(event):
             update(feed, obj)
             feed.rss = obj.xmlUrl
             feed.insertid = insertid
-            write(feed, store(ident(feed)))
+            write(feed)
             nrs += 1
     if nrskip:
         event.reply(f"skipped {nrskip} urls.")

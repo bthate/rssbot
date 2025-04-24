@@ -16,19 +16,21 @@ import types
 import _thread
 
 
-from .. import Fleet, Object, items, keys, later, launch
+from ..client import Fleet
+from ..object import Object, items, keys
+from ..thread import later, launch
 
 
-CHECKSUM = "7b3aa07511d3d882d07a62bd8c3b6239"
-CHECKSUM = ""
+lock = threading.RLock()
+path = os.path.dirname(__file__)
+
+
+CHECKSUM = "5cc897c9c04f64bab4ca5777af24315c"
 MD5      = {}
 NAMES    = {}
 
 
-loadlock = threading.RLock()
-
-
-path = os.path.dirname(__file__)
+"config"
 
 
 class Default(Object):
@@ -40,13 +42,16 @@ class Default(Object):
 class Main(Default):
 
     debug   = False
-    ignore  = 'dbg,udp,wsd'
+    ignore  = ''
     init    = ""
-    md5     = False
+    md5     = True
     name    = __name__.split(".", maxsplit=1)[0]
     opts    = Default()
     verbose = False
-    version = 634
+    version = 311
+
+
+"commands"
 
 
 class Commands:
@@ -86,16 +91,9 @@ def command(evt) -> None:
     evt.ready()
 
 
-def debug(*args):
-    for arg in args:
-        sys.stderr.write(str(arg))
-        sys.stderr.write("\n")
-        sys.stderr.flush()
-
-
 def inits(names) -> [types.ModuleType]:
     modz = []
-    for name in spl(names):
+    for name in sorted(spl(names)):
         try:
             mod = load(name)
             if not mod:
@@ -107,6 +105,67 @@ def inits(names) -> [types.ModuleType]:
             later(ex)
             _thread.interrupt_main()
     return modz
+
+
+def scan(mod) -> None:
+    for key, cmdz in inspect.getmembers(mod, inspect.isfunction):
+        if key.startswith("cb"):
+            continue
+        if 'event' in cmdz.__code__.co_varnames:
+            Commands.add(cmdz, mod)
+
+
+def settable():
+    Commands.names.update(table())
+
+
+"utilities"
+
+
+def debug(*args):
+    for arg in args:
+        sys.stderr.write(str(arg))
+        sys.stderr.write("\n")
+        sys.stderr.flush()
+
+
+def elapsed(seconds, short=True) -> str:
+    txt = ""
+    nsec = float(seconds)
+    if nsec < 1:
+        return f"{nsec:.2f}s"
+    yea = 365*24*60*60
+    week = 7*24*60*60
+    nday = 24*60*60
+    hour = 60*60
+    minute = 60
+    yeas = int(nsec/yea)
+    nsec -= yeas*yea
+    weeks = int(nsec/week)
+    nsec -= weeks*week
+    nrdays = int(nsec/nday)
+    nsec -= nrdays*nday
+    hours = int(nsec/hour)
+    nsec -= hours*hour
+    minutes = int(nsec/minute)
+    nsec -= int(minute*minutes)
+    sec = int(nsec)
+    if yeas:
+        txt += f"{yeas}y"
+    if weeks:
+        nrdays += weeks * 7
+    if nrdays:
+        txt += f"{nrdays}d"
+    if short and txt:
+        return txt.strip()
+    if hours:
+        txt += f"{hours}h"
+    if minutes:
+        txt += f"{minutes}m"
+    if sec:
+        txt += f"{sec}s"
+    txt = txt.strip()
+    return txt
 
 
 def parse(obj, txt=None) -> None:
@@ -168,16 +227,12 @@ def parse(obj, txt=None) -> None:
         obj.txt = obj.cmd or ""
 
 
-def scan(mod) -> None:
-    for key, cmdz in inspect.getmembers(mod, inspect.isfunction):
-        if key.startswith("cb"):
-            continue
-        if 'event' in cmdz.__code__.co_varnames:
-            Commands.add(cmdz, mod)
-
-
-def settable():
-    Commands.names.update(table())
+def spl(txt) -> str:
+    try:
+        result = txt.split(',')
+    except (TypeError, ValueError):
+        result = txt
+    return [x for x in result if x]
 
 
 "imports"
@@ -185,6 +240,8 @@ def settable():
 
 def check(name, md5=""):
     mname = f"{__name__}.{name}"
+    if sys.modules.get(mname):
+        return False
     pth = os.path.join(path, name + ".py")
     spec = importlib.util.spec_from_file_location(mname, pth)
     if not spec:
@@ -228,7 +285,7 @@ def gettbl(name):
 
 
 def load(name) -> types.ModuleType:
-    with loadlock:
+    with lock:
         if name in Main.ignore:
             return
         module = None
@@ -240,8 +297,8 @@ def load(name) -> types.ModuleType:
                 return None
             spec = importlib.util.spec_from_file_location(mname, pth)
             module = importlib.util.module_from_spec(spec)
-            sys.modules[mname] = module
             spec.loader.exec_module(module)
+            sys.modules[mname] = module
         if Main.debug:
             module.DEBUG = True
         return module
@@ -253,15 +310,9 @@ def md5sum(modpath):
         return str(hashlib.md5(txt).hexdigest())
 
 
-def mods(names="", empty=False) -> [types.ModuleType]:
+def mods(names="") -> [types.ModuleType]:
     res = []
-    if empty:
-        try:
-            from . import tbl
-            tbl.NAMES = {}
-        except ImportError:
-            pass
-    for nme in sorted(modules(path)):
+    for nme in modules():
         if names and nme not in spl(names):
             continue
         mod = load(nme)
@@ -272,11 +323,11 @@ def mods(names="", empty=False) -> [types.ModuleType]:
 
 
 def modules(mdir="") -> [str]:
-    return [
-            x[:-3] for x in os.listdir(mdir or path)
-            if x.endswith(".py") and not x.startswith("__") and
-            x[:-3] not in Main.ignore
-           ]
+    return sorted([
+                   x[:-3] for x in os.listdir(mdir or path)
+                   if x.endswith(".py") and not x.startswith("__") and
+                   x[:-3] not in Main.ignore
+                  ])
 
 
 def table():
@@ -287,56 +338,6 @@ def table():
     if names:
         NAMES.update(names)
     return NAMES
-
-
-"utilities"
-
-
-def elapsed(seconds, short=True) -> str:
-    txt = ""
-    nsec = float(seconds)
-    if nsec < 1:
-        return f"{nsec:.2f}s"
-    yea = 365*24*60*60
-    week = 7*24*60*60
-    nday = 24*60*60
-    hour = 60*60
-    minute = 60
-    yeas = int(nsec/yea)
-    nsec -= yeas*yea
-    weeks = int(nsec/week)
-    nsec -= weeks*week
-    nrdays = int(nsec/nday)
-    nsec -= nrdays*nday
-    hours = int(nsec/hour)
-    nsec -= hours*hour
-    minutes = int(nsec/minute)
-    nsec -= int(minute*minutes)
-    sec = int(nsec)
-    if yeas:
-        txt += f"{yeas}y"
-    if weeks:
-        nrdays += weeks * 7
-    if nrdays:
-        txt += f"{nrdays}d"
-    if short and txt:
-        return txt.strip()
-    if hours:
-        txt += f"{hours}h"
-    if minutes:
-        txt += f"{minutes}m"
-    if sec:
-        txt += f"{sec}s"
-    txt = txt.strip()
-    return txt
-
-
-def spl(txt) -> str:
-    try:
-        result = txt.split(',')
-    except (TypeError, ValueError):
-        result = txt
-    return [x for x in result if x]
 
 
 "methods"
@@ -380,9 +381,15 @@ def fmt(obj, args=None, skip=None, plain=False) -> str:
             continue
         if plain:
             txt += f"{value} "
-        elif isinstance(value, str) and len(value.split()) >= 2:
+        elif isinstance(value, str):
             txt += f'{key}="{value}" '
         else:
             txt += f'{key}={value} '
     return txt.strip()
 
+
+"interface"
+
+
+def __dir__():
+    return modules()

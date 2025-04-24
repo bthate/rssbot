@@ -14,10 +14,13 @@ import threading
 import time
 
 
-from .. import Object, ident, keys, last, store, write
-from .. import Client, Event, Fleet, launch
-from .  import debug as ldebug
-from .  import Default, Main, command, edit, fmt
+from ..client  import Client, Fleet
+from ..handler import Event
+from ..object  import Object, keys
+from ..store   import ident, last, path, write 
+from ..thread  import launch
+from .         import debug as ldebug
+from .         import Default, Main, command, edit, fmt
 
 
 IGNORE  = ["PING", "PONG", "PRIVMSG"]
@@ -33,18 +36,24 @@ def debug(txt):
     ldebug(txt)
 
 
+"init"
+
+
 def init():
     irc = IRC()
     irc.start()
-    irc.events.ready.wait()
+    irc.events.joined.wait(30.0)
     debug(f'irc at {Config.server}:{Config.port} {Config.channel}')
     return irc
+
+
+"config"
 
 
 class Config(Default):
 
     channel = f'#{Main.name}'
-    commands = False
+    commands = True
     control = '!'
     nick = Main.name
     password = ""
@@ -509,7 +518,7 @@ class IRC(Client, Output):
 "callbacks"
 
 
-def cb_auth(bot, evt):
+def cb_auth(evt):
     bot = Fleet.get(evt.orig)
     bot.docommand(f'AUTHENTICATE {bot.cfg.password}')
 
@@ -541,7 +550,7 @@ def cb_h904(evt):
     bot.events.authed.set()
 
 
-def cb_kill(bot, evt):
+def cb_kill(evt):
     pass
 
 def cb_log(evt):
@@ -606,7 +615,7 @@ def cfg(event):
                    )
     else:
         edit(config, event.sets)
-        write(config, fnm or store(ident(config)))
+        write(config, fnm or path(config))
         event.done()
 
 
