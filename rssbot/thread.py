@@ -14,7 +14,10 @@ import _thread
 STARTTIME = time.time()
 
 
-"thread"
+class Errors:
+
+    name = __file__.rsplit("/", maxsplit=2)[-2]
+    errors = []
 
 
 class Thread(threading.Thread):
@@ -48,33 +51,6 @@ class Thread(threading.Thread):
                 time.sleep(0.01)
         super().join(timeout)
         return self.result
-
-
-def launch(func, *args, **kwargs) -> Thread:
-    nme = kwargs.get("name")
-    if not nme:
-        nme = name(func)
-    thread = Thread(func, nme, *args, **kwargs)
-    thread.start()
-    return thread
-
-
-def name(obj) -> str:
-    typ = type(obj)
-    if '__builtins__' in dir(typ):
-        return obj.__name__
-    if '__self__' in dir(obj):
-        return f'{obj.__self__.__class__.__name__}.{obj.__name__}'
-    if '__class__' in dir(obj) and '__name__' in dir(obj):
-        return f'{obj.__class__.__name__}.{obj.__name__}'
-    if '__class__' in dir(obj):
-        return f"{obj.__class__.__module__}.{obj.__class__.__name__}"
-    if '__name__' in dir(obj):
-        return f'{obj.__class__.__name__}.{obj.__name__}'
-    return None
-
-
-"timers"
 
 
 class Timer:
@@ -115,21 +91,21 @@ class Repeater(Timer):
         super().run()
 
 
-"errors"
-
-
-class Errors:
-
-    name = __file__.rsplit("/", maxsplit=2)[-2]
-    errors = []
-
-
 def full(exc) -> str:
     return traceback.format_exception(type(exc),exc,exc.__traceback__)
 
 
 def later(exc) -> None:
     Errors.errors.append(exc)
+
+
+def launch(func, *args, **kwargs) -> Thread:
+    nme = kwargs.get("name")
+    if not nme:
+        nme = name(func)
+    thread = Thread(func, nme, *args, **kwargs)
+    thread.start()
+    return thread
 
 
 def line(exc):
@@ -161,7 +137,19 @@ def line(exc):
     return res
 
 
-"interface"
+def name(obj) -> str:
+    typ = type(obj)
+    if '__builtins__' in dir(typ):
+        return obj.__name__
+    if '__self__' in dir(obj):
+        return f'{obj.__self__.__class__.__name__}.{obj.__name__}'
+    if '__class__' in dir(obj) and '__name__' in dir(obj):
+        return f'{obj.__class__.__name__}.{obj.__name__}'
+    if '__class__' in dir(obj):
+        return f"{obj.__class__.__module__}.{obj.__class__.__name__}"
+    if '__name__' in dir(obj):
+        return f'{obj.__class__.__name__}.{obj.__name__}'
+    return None
 
 
 def __dir__():

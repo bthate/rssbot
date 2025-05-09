@@ -12,15 +12,12 @@ import _thread
 
 
 from .client  import Client
-from .handler import Event
+from .event   import Event
 from .json    import dumps
 from .modules import Commands, Main, command, inits
 from .modules import md5sum, mods, modules, parse, scan, settable
 from .store   import Workdir, pidname
 from .thread  import Errors, full
-
-
-"clients"
 
 
 class CLI(Client):
@@ -36,7 +33,6 @@ class CLI(Client):
 class Console(CLI):
 
     def announce(self, txt):
-        #output(txt)
         pass
 
     def callback(self, evt):
@@ -48,9 +44,6 @@ class Console(CLI):
         evt.txt = input("> ")
         evt.type = "command"
         return evt
-
-
-"interrupt handler"
 
 
 def handler(signum, frame):
@@ -316,7 +309,7 @@ WantedBy=multi-user.target"""
 
 def main():
     if check("a"):
-        Main.init   = ",".join(modules())
+        Main.init = ",".join(modules())
     if check("v"):
         setattr(Main.opts, "v", True)
         enable()

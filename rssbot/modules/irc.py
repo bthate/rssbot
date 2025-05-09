@@ -14,10 +14,12 @@ import threading
 import time
 
 
-from ..client  import Client, Fleet
-from ..handler import Event
+from ..client  import Client
+from ..disk    import getpath, ident, write
+from ..event   import Event
+from ..fleet   import Fleet
+from ..find    import last
 from ..object  import Object, keys
-from ..store   import ident, last, path, write 
 from ..thread  import launch
 from .         import debug as ldebug
 from .         import Default, Main, command, edit, fmt
@@ -36,18 +38,12 @@ def debug(txt):
     ldebug(txt)
 
 
-"init"
-
-
 def init():
     irc = IRC()
     irc.start()
     irc.events.joined.wait(30.0)
-    debug(f'irc at {Config.server}:{Config.port} {Config.channel}')
+    debug(f'irc at {irc.cfg.server}:{irc.cfg.port} {irc.cfg.channel}')
     return irc
-
-
-"config"
 
 
 class Config(Default):
@@ -75,9 +71,6 @@ class Config(Default):
         self.realname = Config.realname
         self.server = Config.server
         self.username = Config.username
-
-
-"output"
 
 
 class TextWrap(textwrap.TextWrapper):
@@ -164,9 +157,6 @@ class Output:
 
     def start(self):
         launch(self.output)
-
-
-"irc"
 
 
 class IRC(Client, Output):
@@ -515,9 +505,6 @@ class IRC(Client, Output):
         self.events.ready.wait()
 
 
-"callbacks"
-
-
 def cb_auth(evt):
     bot = Fleet.get(evt.orig)
     bot.docommand(f'AUTHENTICATE {bot.cfg.password}')
@@ -615,7 +602,7 @@ def cfg(event):
                    )
     else:
         edit(config, event.sets)
-        write(config, fnm or path(config))
+        write(config, fnm or getpath(config))
         event.done()
 
 
